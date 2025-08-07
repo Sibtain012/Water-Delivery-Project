@@ -1,0 +1,35 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+    @apply font-custom antialiased text-text;
+}
+
+/* Apply font to all text elements */
+* {
+    font-family: 'Poppins', sans-serif;
+}
+
+/* Apply Playfair Display to headings */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-family: 'Playfair Display', serif;
+}
+
+/* Text shadow utilities for better readability on background images */
+.text-shadow {
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.text-shadow-lg {
+    text-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+}
+
+.text-shadow-xl {
+    text-shadow: 0 6px 12px rgba(0, 0, 0, 0.5);
+}

@@ -1,0 +1,249 @@
+/* Responsive Design Improvements */
+
+/* Mobile-first approach with better breakpoints */
+@media (max-width: 576px) {
+  /* Extra small devices */
+  .container {
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+  }
+  
+  .hero-title {
+    font-size: 2rem;
+    line-height: 1.2;
+  }
+  
+  .hero-subtitle {
+    font-size: 0.875rem;
+  }
+  
+  .btn-hero {
+    padding: 0.75rem 1.5rem;
+    font-size: 0.875rem;
+  }
+}
+
+@media (min-width: 577px) and (max-width: 768px) {
+  /* Small devices (tablets) */
+  .hero-title {
+    font-size: 2.5rem;
+  }
+  
+  .hero-subtitle {
+    font-size: 1rem;
+  }
+  
+  .btn-hero {
+    padding: 1rem 2rem;
+    font-size: 1rem;
+  }
+}
+
+@media (min-width: 769px) and (max-width: 992px) {
+  /* Medium devices */
+  .hero-title {
+    font-size: 3rem;
+  }
+  
+  .hero-subtitle {
+    font-size: 1.125rem;
+  }
+}
+
+@media (min-width: 993px) {
+  /* Large devices and up */
+  .hero-title {
+    font-size: 3.75rem;
+  }
+  
+  .hero-subtitle {
+    font-size: 1.25rem;
+  }
+}
+
+/* Swiper responsive improvements */
+.swiper-pagination {
+  position: static !important;
+  margin-top: 1rem !important;
+}
+
+@media (min-width: 768px) {
+  .swiper-pagination {
+    position: absolute !important;
+    bottom: 20px !important;
+    margin-top: 0 !important;
+  }
+}
+
+/* Responsive navigation improvements */
+.nav-mobile {
+  background: rgba(230, 243, 251, 0.95);
+  backdrop-filter: blur(10px);
+}
+
+/* Responsive image handling */
+.responsive-img {
+  width: 100%;
+  height: auto;
+  max-width: 100%;
+  object-fit: contain;
+}
+
+@media (max-width: 768px) {
+  .responsive-img {
+    max-width: 280px;
+    margin: 0 auto;
+  }
+}
+
+@media (min-width: 769px) {
+  .responsive-img {
+    max-width: 400px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .responsive-img {
+    max-width: 500px;
+  }
+}
+
+/* Responsive grid improvements */
+.responsive-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 640px) {
+  .responsive-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .responsive-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+  }
+}
+
+/* Better spacing for mobile */
+@media (max-width: 768px) {
+  .section-padding {
+    padding-top: 3rem;
+    padding-bottom: 3rem;
+  }
+  
+  .hero-section {
+    padding-top: 6rem;
+    padding-bottom: 3rem;
+  }
+}
+
+@media (min-width: 769px) {
+  .section-padding {
+    padding-top: 5rem;
+    padding-bottom: 5rem;
+  }
+  
+  .hero-section {
+    padding-top: 8rem;
+    padding-bottom: 5rem;
+  }
+}
+
+/* Responsive typography */
+.responsive-text-sm {
+  font-size: 0.875rem;
+}
+
+.responsive-text-base {
+  font-size: 1rem;
+}
+
+.responsive-text-lg {
+  font-size: 1.125rem;
+}
+
+@media (min-width: 640px) {
+  .responsive-text-sm {
+    font-size: 1rem;
+  }
+  
+  .responsive-text-base {
+    font-size: 1.125rem;
+  }
+  
+  .responsive-text-lg {
+    font-size: 1.25rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .responsive-text-sm {
+    font-size: 1.125rem;
+  }
+  
+  .responsive-text-base {
+    font-size: 1.25rem;
+  }
+  
+  .responsive-text-lg {
+    font-size: 1.5rem;
+  }
+}
+
+/* Responsive button improvements */
+.btn-responsive {
+  padding: 0.75rem 1.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  border-radius: 9999px;
+  transition: all 0.3s ease;
+  width: 100%;
+  text-align: center;
+}
+
+@media (min-width: 640px) {
+  .btn-responsive {
+    width: auto;
+    padding: 1rem 2rem;
+    font-size: 1rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .btn-responsive {
+    padding: 1.25rem 2.5rem;
+    font-size: 1.125rem;
+  }
+}
+
+/* Touch-friendly improvements for mobile */
+@media (max-width: 768px) {
+  .touch-target {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  
+  .nav-link-mobile {
+    padding: 1rem 0;
+    font-size: 1.125rem;
+    border-bottom: 1px solid rgba(10, 31, 51, 0.1);
+  }
+}
+
+/* Focus states for better accessibility */
+.focus-visible:focus {
+  outline: 2px solid #5DAE3D;
+  outline-offset: 2px;
+}
+
+/* Better contrast for mobile reading */
+@media (max-width: 768px) {
+  .text-contrast {
+    font-weight: 500;
+  }
+}

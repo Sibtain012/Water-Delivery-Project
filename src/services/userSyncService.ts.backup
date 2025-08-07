@@ -1,0 +1,215 @@
+import { User } from 'firebase/auth';
+import { useCustomerStore } from '../store/customerStore';
+import { firebaseCustomerService } from './firebaseCustomerService';
+import { securityService } from './securityService';
+import { FirebaseCustomer } from '../types/firebase';
+
+export interface SyncedCustomer {
+  id: string;
+  email: string;
+  name: string;
+  phone: string;
+  address: string;
+  password: string;
+  signupMethod: 'google' | 'manual';
+  createdAt: Date;
+  firebaseUid: string;
+}
+
+class UserSyncService {
+  /**
+   * Sync Firebase user to both Firebase database and local store
+   * Creates customer if doesn't exist, updates if exists
+   */
+  syncFirebaseUserToCustomerStore(firebaseUser: User): SyncedCustomer {
+    // For now, just use local sync to prevent breaking changes
+    // Firebase sync will be handled asynchronously in the background
+    const localCustomer = this.syncFirebaseUserLocalOnly(firebaseUser);
+
+    // Asynchronously sync to Firebase in the background
+    this.asyncFirebaseSync(firebaseUser).catch(error => {
+      console.error('Background Firebase sync failed:', error);
+    });
+
+    return localCustomer;
+  }
+
+  /**
+   * Async Firebase sync in the background
+   */
+  private async asyncFirebaseSync(firebaseUser: User): Promise<void> {
+    const maxRetries = 2; // Reduced retries for better UX
+    let retryCount = 0;
+
+    const attemptSync = async (): Promise<void> => {
+      try {
+        // Initialize security service for this user (this sets default permissions immediately)
+        await securityService.initializeUserSecurity(firebaseUser.uid);
+
+        // Try to create or update customer in Firebase
+        const customerData = {
+          firebaseUid: firebaseUser.uid,
+          email: firebaseUser.email || '',
+          name: firebaseUser.displayName || firebaseUser.email?.split('@')[0] || 'User',
+          phone: firebaseUser.phoneNumber || '',
+          address: '',
+          city: '',
+          postalCode: '',
+          signupMethod: this.getSignupMethod(firebaseUser),
+          isActive: true
+        };
+
+        await firebaseCustomerService.createOrUpdateCustomer(customerData);
+        console.log('✅ User successfully synced to Firebase');
+      } catch (error: any) {
+        // Check if it's a network-related error and we should retry
+        const isNetworkError =
+          error?.code === 'unavailable' ||
+          error?.message?.includes('network') ||
+          error?.message?.includes('offline') ||
+          error?.message?.includes('timeout') ||
+          error?.message?.includes('failed to fetch') ||
+          error?.message?.includes('Failed to get document because the client is offline');
+
+        if (isNetworkError) {
+          console.log('📱 Firebase is operating in offline mode - user authenticated locally');
+          return; // Don't retry for offline scenarios
+        }
+
+        if (retryCount < maxRetries) {
+          retryCount++;
+          const delay = Math.min(1000 * Math.pow(2, retryCount), 5000); // Reduced max delay
+          console.log(`⏳ Retrying Firebase sync (${retryCount}/${maxRetries}) in ${delay}ms...`);
+
+          setTimeout(() => {
+            attemptSync().catch(() => {
+              console.log('🔄 Firebase sync will continue in background');
+            });
+          }, delay);
+        } else {
+          console.log('📱 Operating in offline-first mode - user authenticated successfully');
+        }
+      }
+    };
+
+    // Start the sync attempt
+    await attemptSync();
+  }
+
+  /**
+   * Fallback method for local-only sync (backwards compatibility)
+   */
+  private syncFirebaseUserLocalOnly(firebaseUser: User): SyncedCustomer {
+    const {
+      customers,
+      createCustomer,
+      getCustomerByEmail,
+      setCurrentCustomer
+    } = useCustomerStore.getState();
+
+    // Check if customer already exists
+    let existingCustomer = customers.find(c => c.firebaseUid === firebaseUser.uid);
+
+    if (!existingCustomer) {
+      // Check by email as fallback
+      existingCustomer = getCustomerByEmail(firebaseUser.email || '');
+    }
+
+    if (existingCustomer) {
+      // Update existing customer with Firebase UID if missing
+      if (!existingCustomer.firebaseUid) {
+        const updatedCustomer = {
+          ...existingCustomer,
+          firebaseUid: firebaseUser.uid,
+          name: firebaseUser.displayName || existingCustomer.name,
+          phone: firebaseUser.phoneNumber || existingCustomer.phone,
+        };
+
+        // Update in store
+        useCustomerStore.setState(state => ({
+          customers: state.customers.map(c =>
+            c.id === existingCustomer!.id ? updatedCustomer : c
+          ),
+          currentCustomer: updatedCustomer
+        }));
+
+        return {
+          id: updatedCustomer.id,
+          email: updatedCustomer.email,
+          name: updatedCustomer.name || '',
+          phone: updatedCustomer.phone,
+          address: updatedCustomer.address,
+          password: updatedCustomer.password || this.generateRandomPassword(),
+          signupMethod: updatedCustomer.signupMethod || this.getSignupMethod(firebaseUser),
+          createdAt: updatedCustomer.createdAt,
+          firebaseUid: updatedCustomer.firebaseUid || firebaseUser.uid
+        };
+      } else {
+        // Set as current customer
+        setCurrentCustomer(existingCustomer);
+        return {
+          id: existingCustomer.id,
+          email: existingCustomer.email,
+          name: existingCustomer.name || '',
+          phone: existingCustomer.phone,
+          address: existingCustomer.address,
+          password: existingCustomer.password || this.generateRandomPassword(),
+          signupMethod: existingCustomer.signupMethod || this.getSignupMethod(firebaseUser),
+          createdAt: existingCustomer.createdAt,
+          firebaseUid: existingCustomer.firebaseUid || firebaseUser.uid
+        };
+      }
+    } else {
+      // Create new customer
+      const newCustomer = createCustomer({
+        email: firebaseUser.email || '',
+        name: firebaseUser.displayName || firebaseUser.email?.split('@')[0] || 'User',
+        phone: firebaseUser.phoneNumber || '',
+        address: '',
+        password: this.generateRandomPassword(),
+        signupMethod: this.getSignupMethod(firebaseUser),
+        firebaseUid: firebaseUser.uid
+      });
+
+      setCurrentCustomer(newCustomer);
+      return {
+        id: newCustomer.id,
+        email: newCustomer.email,
+        name: newCustomer.name || '',
+        phone: newCustomer.phone,
+        address: newCustomer.address,
+        password: newCustomer.password || this.generateRandomPassword(),
+        signupMethod: newCustomer.signupMethod || this.getSignupMethod(firebaseUser),
+        createdAt: newCustomer.createdAt,
+        firebaseUid: newCustomer.firebaseUid || firebaseUser.uid
+      };
+    }
+  }
+
+  /**
+   * Get current synced customer
+   */
+  getCurrentSyncedCustomer(): SyncedCustomer | null {
+    const { currentCustomer } = useCustomerStore.getState();
+    return currentCustomer;
+  }
+
+  /**
+   * Clear synced customer (for logout)
+   */
+  clearSyncedCustomer(): void {
+    const { logoutCustomer } = useCustomerStore.getState();
+    logoutCustomer();
+  }
+
+  private generateRandomPassword(): string {
+    return Math.random().toString(36).slice(-12);
+  }
+
+  private getSignupMethod(firebaseUser: User): 'google' | 'manual' {
+    const provider = firebaseUser.providerData[0]?.providerId;
+    return provider === 'google.com' ? 'google' : 'manual';
+  }
+}
+
+export const userSyncService = new UserSyncService();

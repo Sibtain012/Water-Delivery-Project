@@ -1,0 +1,201 @@
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
+
+const CustomerAccount: React.FC = () => {
+  const navigate = useNavigate();
+
+  React.useEffect(() => {
+    // Redirect to home since authentication is disabled
+    navigate('/');
+  }, [navigate]);
+
+  return (
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="bg-white p-8 rounded-lg shadow-md max-w-md w-full mx-4">
+        <h2 className="text-2xl font-bold text-center mb-4">Account Access</h2>
+        <p className="text-gray-600 text-center mb-6">
+          User accounts have been simplified for easier ordering. 
+          You can now place orders directly without creating an account.
+        </p>
+        <button
+          onClick={() => navigate('/')}
+          className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors"
+        >
+          Continue Shopping
+        </button>
+      </div>
+    </div>
+  );
+};
+
+export default CustomerAccount;
+
+const CustomerAccount: React.FC = () => {
+  const { currentUser, signOut, loading } = useAuth();
+  const navigate = useNavigate();
+
+  // Debug logging
+  console.log('CustomerAccount - currentUser:', currentUser);
+  console.log('CustomerAccount - loading:', loading);
+
+  // Use useEffect for navigation to prevent rendering issues
+  React.useEffect(() => {
+    if (!loading && !currentUser) {
+      console.log('CustomerAccount - Redirecting to home');
+      navigate('/');
+    }
+  }, [currentUser, loading, navigate]);
+
+  if (!currentUser) {
+    return (
+      <div className="min-h-screen bg-gray-50 pt-24 py-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center">
+            <p className="text-gray-500">Loading...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // For now, we'll show empty orders since we need to implement Firestore integration
+  const orders: any[] = [];
+
+  const handleLogout = async () => {
+    try {
+      await signOut();
+      navigate('/');
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
+  };
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'pending': return 'bg-yellow-100 text-yellow-800';
+      case 'processing': return 'bg-blue-100 text-blue-800';
+      case 'delivered': return 'bg-green-100 text-green-800';
+      case 'cancelled': return 'bg-red-100 text-red-800';
+      default: return 'bg-gray-100 text-gray-800';
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-50 pt-40 py-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Password Display for Google Users */}
+        <CustomerPasswordDisplay />
+
+        {/* Header */}
+        <div className="bg-white shadow-sm rounded-lg mb-8">
+          <div className="px-6 py-4 border-b border-gray-200">
+            <div className="flex justify-between items-center">
+              <h1 className="text-2xl font-bold text-gray-900">My Account</h1>
+              <button
+                onClick={handleLogout}
+                className="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+              >
+                <LogOut className="h-5 w-5 mr-2" />
+                Logout
+              </button>
+            </div>
+          </div>
+
+          {/* Customer Info */}
+          <div className="px-6 py-4">
+            <h2 className="text-lg font-semibold mb-4">Account Information</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="flex items-center space-x-2">
+                <User className="h-5 w-5 text-gray-400" />
+                <span className="text-gray-700">{currentUser.displayName || 'User'}</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Phone className="h-5 w-5 text-gray-400" />
+                <span className="text-gray-700">{currentUser.phoneNumber || 'Not provided'}</span>
+              </div>
+              <div className="flex items-center space-x-2 md:col-span-2">
+                <MapPin className="h-5 w-5 text-gray-400" />
+                <span className="text-gray-700">Address not provided</span>
+              </div>
+              <div className="flex items-center space-x-2 md:col-span-2">
+                <span className="text-gray-500">Email: {currentUser.email}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Orders Section */}
+        <div className="bg-white shadow-sm rounded-lg">
+          <div className="px-6 py-4 border-b border-gray-200">
+            <h2 className="text-xl font-bold text-gray-900">My Orders</h2>
+          </div>
+
+          <div className="p-6">
+            {orders.length === 0 ? (
+              <div className="text-center py-8">
+                <p className="text-gray-500">You haven't placed any orders yet.</p>
+                <button
+                  onClick={() => navigate('/products')}
+                  className="mt-4 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
+                >
+                  Start Shopping
+                </button>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {orders.map((order) => (
+                  <div key={order.id} className="border border-gray-200 rounded-lg p-4">
+                    <div className="flex justify-between items-start mb-3">
+                      <div>
+                        <h3 className="font-semibold text-gray-900">Order #{order.id}</h3>
+                        <p className="text-sm text-gray-500">
+                          Placed on {new Date(order.orderDate).toLocaleDateString()}
+                        </p>
+                      </div>
+                      <span className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(order.status)}`}>
+                        {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
+                      </span>
+                    </div>
+
+                    {/* Delivery Info */}
+                    <div className="flex items-center space-x-4 text-sm text-gray-600 mb-3">
+                      <div className="flex items-center space-x-1">
+                        <Calendar className="h-4 w-4" />
+                        <span>{order.deliveryDate}</span>
+                      </div>
+                      <div className="flex items-center space-x-1">
+                        <Package className="h-4 w-4" />
+                        <span>{order.deliveryTime}</span>
+                      </div>
+                    </div>
+
+                    {/* Order Items */}
+                    <div className="border-t pt-3">
+                      <div className="space-y-2">
+                        {order.items.map((item, index) => (
+                          <div key={index} className="flex justify-between items-center">
+                            <div className="flex items-center space-x-2">
+                              <span className="text-sm font-medium">{item.product.name}</span>
+                              <span className="text-sm text-gray-500">x{item.quantity}</span>
+                            </div>
+                            <span className="text-sm font-medium">PKR {(item.product.price * item.quantity).toFixed(2)}</span>
+                          </div>
+                        ))}
+                      </div>
+                      <div className="border-t mt-3 pt-3 flex justify-between">
+                        <span className="font-semibold">Total</span>
+                        <span className="font-semibold">PKR {order.total.toFixed(2)}</span>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default CustomerAccount;

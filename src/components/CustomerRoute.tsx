@@ -1,0 +1,13 @@
+import React from 'react';
+
+interface CustomerRouteProps {
+  children: React.ReactNode;
+  redirectTo?: string;
+}
+
+const CustomerRoute: React.FC<CustomerRouteProps> = ({ children }) => {
+  // Since authentication is disabled, always render children
+  return <>{children}</>;
+};
+
+export default CustomerRoute;

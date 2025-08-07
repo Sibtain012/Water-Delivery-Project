@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>EmailJS Template Test</title>
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+</head>
+<body>
+    <h1>EmailJS Template Test</h1>
+    <button onclick="testAdmin()">Test Admin Email</button>
+    <button onclick="testCustomer()">Test Customer Email</button>
+    <div id="results"></div>
+
+    <script>
+        // Initialize EmailJS
+        emailjs.init('C20yscudq01bTtC8I');
+
+        function log(message) {
+            document.getElementById('results').innerHTML += '<p>' + message + '</p>';
+            console.log(message);
+        }
+
+        async function testAdmin() {
+            log('Testing admin template: template_fy2d29a');
+            try {
+                const result = await emailjs.send(
+                    'service_se59j7c', 
+                    'template_fy2d29a', 
+                    {
+                        to_name: 'Admin',
+                        to_email: 'sibtainahmed410@gmail.com',
+                        order_id: 'TEST-ADMIN-001',
+                        customer_name: 'Test Customer',
+                        customer_email: 'test@example.com',
+                        order_total: '100.00'
+                    }
+                );
+                log('✅ Admin email sent successfully: ' + result.status);
+            } catch (error) {
+                log('❌ Admin email failed: ' + error.text);
+            }
+        }
+
+        async function testCustomer() {
+            log('Testing customer template: template_zuw9l89');
+            try {
+                const result = await emailjs.send(
+                    'service_se59j7c', 
+                    'template_zuw9l89', 
+                    {
+                        to_name: 'Test Customer',
+                        to_email: 'sibtainahmed410@gmail.com',
+                        order_id: 'TEST-CUSTOMER-001',
+                        customer_name: 'Test Customer',
+                        order_total: '100.00'
+                    }
+                );
+                log('✅ Customer email sent successfully: ' + result.status);
+            } catch (error) {
+                log('❌ Customer email failed: ' + error.text);
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>EmailJS Configuration Test</title>
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+</head>
+<body>
+    <h1>EmailJS Configuration Test</h1>
+    
+    <h2>Test Configuration 1 (Current .env)</h2>
+    <button onclick="testConfig1()">Test Config 1</button>
+    
+    <h2>Test Configuration 2 (Old emailTest.ts)</h2>
+    <button onclick="testConfig2()">Test Config 2</button>
+    
+    <div id="results"></div>
+
+    <script>
+        function log(message) {
+            document.getElementById('results').innerHTML += '<p>' + message + '</p>';
+            console.log(message);
+        }
+
+        // Configuration 1: Current .env
+        async function testConfig1() {
+            log('=== Testing Configuration 1 (Current .env) ===');
+            emailjs.init('C20yscudq01bTtC8I');
+            
+            try {
+                const result = await emailjs.send(
+                    'service_se59j7c', 
+                    'template_fy2d29a', // Admin template
+                    {
+                        to_name: 'Admin Test',
+                        to_email: 'sibtainahmed410@gmail.com',
+                        order_id: 'TEST-CONFIG1-001'
+                    }
+                );
+                log('✅ Config 1 Admin Template WORKS: ' + result.status);
+            } catch (error) {
+                log('❌ Config 1 Admin Template FAILED: ' + error.text);
+            }
+        }
+
+        // Configuration 2: Old emailTest.ts
+        async function testConfig2() {
+            log('=== Testing Configuration 2 (Old emailTest.ts) ===');
+            emailjs.init('pMI9I1fmj_3hBGOnn');
+            
+            try {
+                const result = await emailjs.send(
+                    'service_aabetahura', 
+                    'template_hj6x7lf', // Admin template
+                    {
+                        to_name: 'Admin Test',
+                        to_email: 'sibtainahmed410@gmail.com',
+                        order_id: 'TEST-CONFIG2-001'
+                    }
+                );
+                log('✅ Config 2 Admin Template WORKS: ' + result.status);
+            } catch (error) {
+                log('❌ Config 2 Admin Template FAILED: ' + error.text);
+            }
+        }
+    </script>
+</body>
+</html>
