@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { X, CheckCircle, Star, Truck, Clock, Shield } from 'lucide-react';
 import { useCartStore } from '../store/cartStore';
 import { Product, CartItem } from '../types';
+import { useSubscriptionPlanStore, SubscriptionPlan as AdminSubscriptionPlan } from '../store/subscriptionPlanStore';
 
 interface SubscriptionModalProps {
   isOpen: boolean;
@@ -27,6 +28,7 @@ const SubscriptionModal: React.FC<SubscriptionModalProps> = ({
 }) => {
   const [selectedPlan, setSelectedPlan] = useState<SubscriptionPlan | null>(null);
   const { addItem, toggleCart } = useCartStore();
+  const { plans } = useSubscriptionPlanStore();
 
   // Handle escape key and body scroll lock
   useEffect(() => {
@@ -47,36 +49,17 @@ const SubscriptionModal: React.FC<SubscriptionModalProps> = ({
     }
   }, [isOpen, onClose]);
 
-  const subscriptionPlans: SubscriptionPlan[] = [
-    {
-      id: 'basic',
-      name: 'Basic Plan',
-      price: 2999,
-      bottles: 8,
-      frequency: 'Monthly',
-      savings: 'Save 10%',
-      features: ['8 bottles monthly', 'Free delivery', 'Cancel anytime']
-    },
-    {
-      id: 'family',
-      name: 'Family Plan',
-      price: 4999,
-      bottles: 12,
-      frequency: 'Monthly',
-      popular: true,
-      savings: 'Save 15%',
-      features: ['12 bottles monthly', 'Free delivery', 'Priority support', 'Cancel anytime']
-    },
-    {
-      id: 'premium',
-      name: 'Premium Plan',
-      price: 7999,
-      bottles: 20,
-      frequency: 'Monthly',
-      savings: 'Save 18%',
-      features: ['20 bottles monthly', 'Free priority delivery', 'Half bottle security deposit', 'Dedicated support', 'Cancel anytime']
-    },
-  ];
+  // Normalize plans from store to modal's expected shape
+  const subscriptionPlans: SubscriptionPlan[] = (plans as AdminSubscriptionPlan[]).map((p) => ({
+    id: p.id,
+    name: p.name,
+    price: p.price,
+    bottles: p.bottles,
+    frequency: p.frequency,
+    popular: p.popular,
+    savings: p.savings,
+    features: p.features
+  }));
 
   const handleSubscribe = () => {
     if (selectedPlan) {
@@ -209,9 +192,11 @@ const SubscriptionModal: React.FC<SubscriptionModalProps> = ({
                     <span className="text-3xl font-bold text-text">PKR {plan.price.toLocaleString()}</span>
                     <span className="text-text/70 ml-1">/{plan.frequency.toLowerCase()}</span>
                   </div>
-                  <div className="bg-secondary/10 text-secondary px-3 py-1 rounded-full text-sm font-semibold inline-block">
-                    {plan.savings}
-                  </div>
+                  {plan.savings && (
+                    <div className="bg-secondary/10 text-secondary px-3 py-1 rounded-full text-sm font-semibold inline-block">
+                      {plan.savings}
+                    </div>
+                  )}
                 </div>
 
                 <ul className="space-y-3 mb-6">

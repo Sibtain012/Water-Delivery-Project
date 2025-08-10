@@ -5,20 +5,23 @@ import ProductCard from '../components/ProductCard';
 import AddToCartModal from '../components/AddToCartModal';
 import SubscriptionModal from '../components/SubscriptionModal';
 // import SubscriptionDropdown from '../components/SubscriptionDropdown';
-import { products } from '../data/products';
+import { useProductStore } from '../store/productStore';
 import { Product } from '../types';
 import WaterCompositionSection from '../components/WaterCompositionSection';
 import HeroSlider from '../components/HeroSlider';
 import DeliveryHighlightSection from '../components/DeliveryHighlightSection';
 import FeatureSection from '../components/FeatureSection';
+import { usePageTitle } from '../hooks/usePageTitle';
 
 const Home: React.FC = () => {
+  usePageTitle('Home');
   const navigate = useNavigate();
+  const { products } = useProductStore();
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSubscriptionModalOpen, setIsSubscriptionModalOpen] = useState(false);
 
-  const featuredProducts = products.filter(p => p.featured);
+  const featuredProducts = products.filter((p: Product) => p.featured);
 
   const handleAddToCart = (product: Product) => {
     setSelectedProduct(product);
@@ -478,4 +481,4 @@ const Home: React.FC = () => {
   );
 };
 
-export default Home;  
+export default Home;

@@ -1,25 +1,30 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Plus, Minus, Star, Truck, Shield, RefreshCw } from 'lucide-react';
-import { products } from '../data/products';
+import { useProductStore } from '../store/productStore';
 import { Product } from '../types';
 import AddToCartModal from '../components/AddToCartModal';
+import { usePageTitle } from '../hooks/usePageTitle';
 
 const ProductDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { products } = useProductStore();
   const [product, setProduct] = useState<Product | null>(null);
   const [quantity, setQuantity] = useState(1);
   const [selectedImage, setSelectedImage] = useState(0);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
+  // Set page title based on product name
+  usePageTitle(product ? product.name : 'Product Detail');
+
   useEffect(() => {
     if (id) {
-      const foundProduct = products.find(p => p.id === id);
+      const foundProduct = products.find((p: Product) => p.id === id);
       setProduct(foundProduct || null);
       window.scrollTo(0, 0);
     }
-  }, [id]);
+  }, [id, products]);
 
   if (!product) {
     return (

@@ -1,7 +1,9 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { usePageTitle } from '../hooks/usePageTitle';
 
 const CustomerAccount: React.FC = () => {
+  usePageTitle('Customer Account');
   const navigate = useNavigate();
 
   React.useEffect(() => {

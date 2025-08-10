@@ -1,26 +1,27 @@
 import React, { useState } from 'react';
-import { subscriptionPlans } from '../data/products';
+import { useSubscriptionPlanStore } from '../store/subscriptionPlanStore';
 import { useCartStore } from '../store/cartStore';
 import { Product, CartItem } from '../types';
 
 const SubscriptionDropdown: React.FC = () => {
     const [selectedPlanId, setSelectedPlanId] = useState<string>('');
     const { addItem, toggleCart } = useCartStore();
+    const { plans } = useSubscriptionPlanStore();
 
     const handlePlanSelect = (planId: string) => {
         setSelectedPlanId(planId);
 
         if (planId) {
-            const selectedPlan = subscriptionPlans.find(plan => plan.id === planId);
+            const selectedPlan = plans.find(plan => plan.id === planId);
             if (selectedPlan) {
                 // Create a generic subscription product
                 const subscriptionProduct: Product = {
                     id: `subscription-${planId}`,
                     name: `${selectedPlan.name} Subscription`,
                     description: `Regular delivery: ${selectedPlan.name}`,
-                    price: calculatePlanPrice(selectedPlan),
+                    price: selectedPlan.price,
                     image: '/assets/images/imgi_21_19-Liter-Bottle-Tap-and-Stand-1_720x.jpg',
-                    size: selectedPlan.name,
+                    size: selectedPlan.bottles ? `${selectedPlan.bottles} bottles` : selectedPlan.name,
                     type: 'bottle',
                     hasExchange: false,
                     depositPrice: 0
@@ -47,21 +48,6 @@ const SubscriptionDropdown: React.FC = () => {
         }
     };
 
-    // Calculate price based on plan (base bottle price * quantity * discount)
-    const calculatePlanPrice = (plan: { name: string; discount: number }) => {
-        const baseBottlePrice = 250; // Base price per bottle
-        let quantity = 1;
-
-        // Extract quantity from plan name
-        if (plan.name.includes('3 bottles')) quantity = 3;
-        else if (plan.name.includes('5 bottles')) quantity = 5;
-        else if (plan.name.includes('12 bottles')) quantity = 12;
-        else if (plan.name.includes('20 bottles')) quantity = 20;
-
-        const basePrice = baseBottlePrice * quantity;
-        return basePrice * (1 - plan.discount);
-    };
-
     return (
         <div className="w-full max-w-xs">
             <select
@@ -77,9 +63,9 @@ const SubscriptionDropdown: React.FC = () => {
                 }}
             >
                 <option value="" style={{ color: '#333' }}>Select a plan</option>
-                {subscriptionPlans.map((plan) => (
+                {plans.map((plan) => (
                     <option key={plan.id} value={plan.id} style={{ color: '#333' }}>
-                        {plan.name} ({Math.round(plan.discount * 100)}% off)
+                        {plan.name} {plan.savings ? `(${plan.savings})` : ''}
                     </option>
                 ))}
             </select>

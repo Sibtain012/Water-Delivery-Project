@@ -5,11 +5,14 @@ import { useCartStore } from '../store/cartStore';
 import { CheckoutForm } from '../types';
 import { emailService, OrderEmailData } from '../services/emailService';
 import { firebaseOrderService } from '../services/firebaseOrderService';
-import { subscriptionPlans } from '../data/products';
+import { useSubscriptionPlanStore } from '../store/subscriptionPlanStore';
+import { usePageTitle } from '../hooks/usePageTitle';
 
 const Checkout: React.FC = () => {
+  usePageTitle('Checkout');
   const navigate = useNavigate();
   const { items, getTotalPrice, clearCart } = useCartStore();
+  const { plans } = useSubscriptionPlanStore();
   const [isProcessing, setIsProcessing] = useState(false);
   const [orderCompleted, setOrderCompleted] = useState(false);
   const [formData, setFormData] = useState<CheckoutForm>({
@@ -101,15 +104,15 @@ const Checkout: React.FC = () => {
           // Get subscription plan details if this is a subscription item
           const getSubscriptionDetails = () => {
             if (item.purchaseType === 'subscription' && item.subscriptionPlan) {
-              const plan = subscriptionPlans.find(p => p.id === item.subscriptionPlan);
+              const plan = plans.find(p => p.id === item.subscriptionPlan);
               if (plan) {
                 return {
                   planId: plan.id,
                   planName: plan.name,
-                  frequency: 'Monthly', // Default frequency
-                  bottles: parseInt(plan.name.split(' ')[0]) || 1,
-                  savings: `${Math.round(plan.discount * 100)}% off`,
-                  discount: plan.discount
+                  frequency: plan.frequency || 'Monthly',
+                  bottles: plan.bottles || 1,
+                  savings: plan.savings || 'Savings applied',
+                  discount: plan.discount || 0.15
                 };
               }
             }
@@ -164,7 +167,7 @@ const Checkout: React.FC = () => {
           customerAddress: `${formData.address}, ${formData.city} ${formData.postalCode}`,
           orderItems: items.map(item => {
             const subscriptionDetails = item.purchaseType === 'subscription' && item.subscriptionPlan
-              ? subscriptionPlans.find(p => p.id === item.subscriptionPlan)
+              ? plans.find(p => p.id === item.subscriptionPlan)
               : null;
 
             return {
@@ -175,7 +178,7 @@ const Checkout: React.FC = () => {
               purchaseType: item.purchaseType,
               subscriptionPlan: item.subscriptionPlan,
               subscriptionDetails: subscriptionDetails
-                ? `${subscriptionDetails.name} (${Math.round(subscriptionDetails.discount * 100)}% off)`
+                ? `${subscriptionDetails.name} (${subscriptionDetails.savings || 'Savings applied'})`
                 : undefined
             };
           }),
@@ -186,7 +189,7 @@ const Checkout: React.FC = () => {
           hasSubscriptions,
           subscriptionSummary: hasSubscriptions
             ? subscriptionItems.map(item => {
-              const plan = subscriptionPlans.find(p => p.id === item.subscriptionPlan);
+              const plan = plans.find(p => p.id === item.subscriptionPlan);
               return `${item.product.name} - ${plan?.name || 'Unknown plan'}`;
             }).join(', ')
             : undefined
@@ -455,7 +458,7 @@ const Checkout: React.FC = () => {
                   Payment Method
                 </h2>
                 <div className="space-y-4">
-                  <div className="flex items-center space-x-3 p-4 border border-gray-300 rounded-lg bg-white">
+                  {/* <div className="flex items-center space-x-3 p-4 border border-gray-300 rounded-lg bg-white">
                     <input
                       type="radio"
                       name="paymentMethod"
@@ -471,7 +474,7 @@ const Checkout: React.FC = () => {
                       </div>
                       <p className="text-sm text-slate-500 mt-1">Pay when your order is delivered</p>
                     </div>
-                  </div>
+                  </div> */}
 
                   <div className="flex items-center space-x-3 p-4 border border-gray-300 rounded-lg bg-white cursor-pointer hover:bg-gray-50"
                     onClick={() => {
@@ -638,7 +641,7 @@ const Checkout: React.FC = () => {
                           Subscription Details
                         </div>
                         {(() => {
-                          const plan = subscriptionPlans.find(p => p.id === item.subscriptionPlan);
+                          const plan = plans.find(p => p.id === item.subscriptionPlan);
                           if (plan) {
                             return (
                               <div className="space-y-1 text-xs">
@@ -648,7 +651,7 @@ const Checkout: React.FC = () => {
                                 </div>
                                 <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
                                   <span>💰 Savings:</span>
-                                  <strong>{Math.round(plan.discount * 100)}% off</strong>
+                                  <strong>{Math.round((plan.discount || 0) * 100)}% off</strong>
                                   <span className="text-green-600">regular price</span>
                                 </div>
                                 <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
@@ -661,7 +664,7 @@ const Checkout: React.FC = () => {
                                 </div>
                                 <div className="mt-2 p-1.5 sm:p-2 bg-green-100 rounded border border-green-200">
                                   <div className="text-green-700 font-medium text-xs leading-tight">
-                                    ✓ You'll save PKR {((item.product.price * item.quantity * plan.discount)).toFixed(2)} on this order
+                                    ✓ You'll save PKR {((item.product.price * item.quantity * (plan.discount || 0))).toFixed(2)} on this order
                                   </div>
                                 </div>
                               </div>
@@ -694,8 +697,8 @@ const Checkout: React.FC = () => {
                   <span>Subscription Savings</span>
                   <span className="font-medium">
                     -PKR {items.filter(item => item.purchaseType === 'subscription').reduce((total, item) => {
-                      const plan = subscriptionPlans.find(p => p.id === item.subscriptionPlan);
-                      return total + (plan ? (item.product.price * item.quantity * plan.discount) : 0);
+                      const plan = plans.find(p => p.id === item.subscriptionPlan);
+                      return total + (plan ? (item.product.price * item.quantity * (plan.discount || 0)) : 0);
                     }, 0).toFixed(2)}
                   </span>
                 </div>
@@ -740,105 +743,124 @@ const Checkout: React.FC = () => {
 
         {/* EasyPaisa Payment Modal */}
         {showEasyPaisaModal && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-lg max-w-md w-full p-6 relative">
-              <button
-                onClick={() => setShowEasyPaisaModal(false)}
-                className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
-              >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-
-              <div className="text-center mb-6">
-                <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <svg className="w-8 h-8 text-green-600" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
+          <div
+            className="fixed inset-0 z-50 flex items-end md:items-center md:justify-center bg-black/60"
+            onClick={() => setShowEasyPaisaModal(false)}
+          >
+            <div
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="easypaisa-title"
+              className="w-full md:w-auto bg-white rounded-t-2xl md:rounded-xl shadow-2xl md:max-w-lg lg:max-w-xl max-h-[90vh] md:max-h-[85vh] overflow-y-auto focus:outline-none"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="p-4 sm:p-6 relative">
+                {/* Close button */}
+                <button
+                  onClick={() => setShowEasyPaisaModal(false)}
+                  className="absolute top-3 right-3 sm:top-4 sm:right-4 text-gray-500 hover:text-gray-700 rounded-full p-2 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-300"
+                  aria-label="Close modal"
+                >
+                  <svg className="w-6 h-6 sm:w-7 sm:h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                   </svg>
-                </div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">EasyPaisa Payment Details</h3>
-                <p className="text-gray-600">Complete your payment using the details below</p>
-              </div>
+                </button>
 
-              <div className="space-y-4 mb-6">
-                <div className="bg-gray-50 rounded-lg p-4">
-                  <div className="flex justify-between items-center mb-2">
-                    <span className="text-sm font-medium text-gray-700">Account Name:</span>
-                    <span className="text-sm font-semibold text-gray-900">Water Delivery Service</span>
+                {/* Drag handle for mobile */}
+                <div className="mx-auto mb-3 h-1.5 w-12 rounded-full bg-gray-300 md:hidden" />
+
+                <div className="text-center mb-4 sm:mb-6">
+                  <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4">
+                    <svg className="w-8 h-8 text-green-600" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
+                    </svg>
                   </div>
-                  <div className="flex justify-between items-center mb-2">
-                    <span className="text-sm font-medium text-gray-700">Account Number:</span>
-                    <div className="flex items-center space-x-2">
-                      <span className="text-sm font-semibold text-gray-900 font-mono">0334-697774</span>
-                      <button
-                        onClick={() => navigator.clipboard.writeText('0334-697774')}
-                        className="text-blue-600 hover:text-blue-800 text-xs"
-                      >
-                        Copy
-                      </button>
+                  <h3 id="easypaisa-title" className="text-lg sm:text-xl font-semibold text-gray-900 mb-1 sm:mb-2">EasyPaisa Payment Details</h3>
+                  <p className="text-sm sm:text-base text-gray-600">Complete your payment using the details below</p>
+                </div>
+
+                <div className="space-y-3 sm:space-y-4 mb-4 sm:mb-6">
+                  <div className="bg-gray-50 rounded-lg p-3 sm:p-4">
+                    <div className="flex flex-col gap-2">
+                      <div className="flex items-center justify-between gap-3">
+                        <span className="text-xs sm:text-sm font-medium text-gray-700">Account Name:</span>
+                        <span className="text-sm sm:text-base font-semibold text-gray-900 text-right truncate">Muhammad Tahir Aftab Butt</span>
+                      </div>
+                      <div className="flex items-center justify-between gap-3">
+                        <span className="text-xs sm:text-sm font-medium text-gray-700">Account Number:</span>
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm sm:text-base font-semibold text-gray-900 font-mono break-all">03346977744</span>
+                          <button
+                            onClick={() => navigator.clipboard.writeText('0334-697774')}
+                            className="text-blue-600 hover:text-blue-800 text-xs sm:text-sm font-medium"
+                          >
+                            Copy
+                          </button>
+                        </div>
+                      </div>
+                      <div className="flex items-center justify-between gap-3">
+                        <span className="text-xs sm:text-sm font-medium text-gray-700">Amount:</span>
+                        <span className="text-lg sm:text-xl font-bold text-green-600">PKR {getTotalPrice().toFixed(2)}</span>
+                      </div>
                     </div>
                   </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm font-medium text-gray-700">Amount:</span>
-                    <span className="text-lg font-bold text-green-600">PKR {getTotalPrice().toFixed(2)}</span>
+
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 sm:p-4">
+                    <h4 className="font-medium text-blue-900 mb-1 sm:mb-2 text-sm sm:text-base">Payment Instructions:</h4>
+                    <ol className="text-xs sm:text-sm text-blue-800 space-y-1 list-decimal list-inside">
+                      <li>Open your EasyPaisa app</li>
+                      <li>Select "Send Money" or "Money Transfer"</li>
+                      <li>Enter the account number above</li>
+                      <li>Enter the exact amount: PKR {getTotalPrice().toFixed(2)}</li>
+                      <li>Complete the transaction</li>
+                      <li>Take a screenshot of the confirmation</li>
+                    </ol>
                   </div>
-                </div>
 
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                  <h4 className="font-medium text-blue-900 mb-2">Payment Instructions:</h4>
-                  <ol className="text-sm text-blue-800 space-y-1 list-decimal list-inside">
-                    <li>Open your EasyPaisa app</li>
-                    <li>Select "Send Money" or "Money Transfer"</li>
-                    <li>Enter the account number above</li>
-                    <li>Enter the exact amount: PKR {getTotalPrice().toFixed(2)}</li>
-                    <li>Complete the transaction</li>
-                    <li>Take a screenshot of the confirmation</li>
-                  </ol>
-                </div>
-
-                <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-                  <div className="flex items-start space-x-3">
-                    <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
-                      <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
-                      </svg>
-                    </div>
-                    <div className="flex-1">
-                      <h4 className="font-medium text-green-800 mb-1">Important:</h4>
-                      <p className="text-sm text-green-700 mb-2">
-                        Please share your payment screenshot to our WhatsApp number:
-                      </p>
-                      <div className="flex items-center space-x-2">
-                        <span className="font-semibold text-green-800">+92 334 697774</span>
-                        <button
-                          onClick={() => window.open('https://wa.me/92334697774', '_blank')}
-                          className="bg-green-600 hover:bg-green-700 text-white text-xs px-3 py-1 rounded-full transition-colors"
-                        >
-                          Open WhatsApp
-                        </button>
+                  <div className="bg-green-50 border border-green-200 rounded-lg p-3 sm:p-4">
+                    <div className="flex items-start gap-3">
+                      <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 24 24">
+                          <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
+                        </svg>
+                      </div>
+                      <div className="flex-1">
+                        <h4 className="font-medium text-green-800 mb-1 sm:mb-2 text-sm sm:text-base">Important:</h4>
+                        <p className="text-xs sm:text-sm text-green-700 mb-2">Please share your payment screenshot to our WhatsApp number:</p>
+                        <div className="flex flex-wrap items-center gap-2">
+                          <span className="font-semibold text-green-800">+92 334 6977744</span>
+                          <button
+                            onClick={() => window.open('https://wa.me/92334697774', '_blank')}
+                            className="bg-green-600 hover:bg-green-700 text-white text-xs sm:text-sm px-3 py-1.5 rounded-full transition-colors"
+                          >
+                            Open WhatsApp
+                          </button>
+                        </div>
                       </div>
                     </div>
                   </div>
                 </div>
-              </div>
 
-              <div className="flex space-x-3">
-                <button
-                  onClick={() => setShowEasyPaisaModal(false)}
-                  className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={() => {
-                    setShowEasyPaisaModal(false);
-                    // Keep EasyPaisa selected
-                  }}
-                  className="flex-1 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors"
-                >
-                  I've Made Payment
-                </button>
+                {/* Sticky action bar */}
+                <div className="sticky bottom-0 left-0 right-0 bg-white pt-2 sm:pt-3 pb-[env(safe-area-inset-bottom)]">
+                  <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
+                    <button
+                      onClick={() => setShowEasyPaisaModal(false)}
+                      className="w-full sm:flex-1 px-4 py-2.5 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      onClick={() => {
+                        setShowEasyPaisaModal(false);
+                        // Keep EasyPaisa selected
+                      }}
+                      className="w-full sm:flex-1 px-4 py-2.5 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors"
+                    >
+                      I've Made Payment
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
           </div>

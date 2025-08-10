@@ -1,11 +1,12 @@
 import React from 'react';
 import { X, Plus, Minus, ShoppingBag } from 'lucide-react';
 import { useCartStore } from '../store/cartStore';
-import { subscriptionPlans } from '../data/products';
+import { useSubscriptionPlanStore } from '../store/subscriptionPlanStore';
 import { Link } from 'react-router-dom';
 
 const CartSidebar: React.FC = () => {
   const { items, isOpen, toggleCart, updateQuantity, removeItem, getTotalPrice, getTotalItems } = useCartStore();
+  const { plans } = useSubscriptionPlanStore();
 
   if (!isOpen) return null;
 
@@ -64,13 +65,13 @@ const CartSidebar: React.FC = () => {
                         <div className="mt-2 p-2 bg-green-50 rounded text-xs">
                           <div className="text-green-800">
                             {(() => {
-                              const plan = subscriptionPlans.find(p => p.id === item.subscriptionPlan);
+                              const plan = plans.find(p => p.id === item.subscriptionPlan);
                               if (plan) {
                                 return (
                                   <div className="space-y-1">
                                     <div className="font-medium text-xs leading-tight">{plan.name}</div>
                                     <div className="text-green-600 text-xs leading-tight">
-                                      {Math.round(plan.discount * 100)}% savings • Auto delivery
+                                      {plan.savings || 'Savings applied'} • Auto delivery
                                     </div>
                                   </div>
                                 );

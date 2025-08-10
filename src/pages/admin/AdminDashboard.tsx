@@ -2,16 +2,23 @@ import React, { useState } from 'react';
 import { useProductStore } from '../../store/productStore';
 import { useAuthStore } from '../../store/authStore';
 import { Product } from '../../types';
-import { Pencil, Trash2, Plus, LogOut, Cookie } from 'lucide-react';
+import { Pencil, Trash2, Plus, LogOut, Cookie, Settings, RefreshCcw } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import ProductModal from '../../components/admin/ProductModal';
+import { useSubscriptionPlanStore } from '../../store/subscriptionPlanStore';
+import SubscriptionPlanModal from '../../components/admin/SubscriptionPlanModal';
+import { usePageTitle } from '../../hooks/usePageTitle';
 
 const AdminDashboard: React.FC = () => {
-  const { products, deleteProduct } = useProductStore();
+  usePageTitle('Admin Dashboard');
+  const { products, deleteProduct, resetProducts } = useProductStore();
+  const { plans, addPlan, updatePlan, deletePlan, resetPlans } = useSubscriptionPlanStore();
   const logout = useAuthStore((state) => state.logout);
   const navigate = useNavigate();
   const [showAddModal, setShowAddModal] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+  const [showPlanModal, setShowPlanModal] = useState(false);
+  const [editingPlanId, setEditingPlanId] = useState<string | null>(null);
 
   const handleDelete = (id: string) => {
     if (window.confirm('Are you sure you want to delete this product?')) {
@@ -23,9 +30,43 @@ const AdminDashboard: React.FC = () => {
     setEditingProduct(product);
   };
 
+  const handlePlanSave = (plan: any) => {
+    if (editingPlanId) {
+      updatePlan(editingPlanId, plan);
+    } else {
+      addPlan(plan);
+    }
+    setShowPlanModal(false);
+    setEditingPlanId(null);
+  };
+
+  const openAddPlan = () => {
+    setEditingPlanId(null);
+    setShowPlanModal(true);
+  };
+
+  const openEditPlan = (id: string) => {
+    setEditingPlanId(id);
+    setShowPlanModal(true);
+  };
+
   const handleLogout = () => {
     logout();
     navigate('/admin-login');
+  };
+
+  const handleResetProducts = () => {
+    if (window.confirm('Are you sure you want to reset all products to default? This will remove all your custom changes.')) {
+      resetProducts();
+      alert('Products have been reset to default values.');
+    }
+  };
+
+  const handleResetPlans = () => {
+    if (window.confirm('Reset subscription plans to defaults? This will remove all custom plans.')) {
+      resetPlans();
+      alert('Subscription plans have been reset to default values.');
+    }
   };
 
   return (
@@ -63,6 +104,26 @@ const AdminDashboard: React.FC = () => {
                   Manage Cookies
                 </button>
                 <button
+                  onClick={handleResetProducts}
+                  className="inline-flex items-center justify-center px-3 sm:px-4 py-2 border border-red-300 text-sm font-medium rounded-md text-red-700 bg-white hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+                >
+                  Reset Products
+                </button>
+                <button
+                  onClick={openAddPlan}
+                  className="inline-flex items-center justify-center px-3 sm:px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+                >
+                  <Plus className="h-4 sm:h-5 w-4 sm:w-5 mr-2" />
+                  Add Subscription Plan
+                </button>
+                <button
+                  onClick={handleResetPlans}
+                  className="inline-flex items-center justify-center px-3 sm:px-4 py-2 border border-amber-300 text-sm font-medium rounded-md text-amber-800 bg-white hover:bg-amber-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500"
+                >
+                  <RefreshCcw className="h-4 sm:h-5 w-4 sm:w-5 mr-2" />
+                  Reset Plans
+                </button>
+                <button
                   onClick={handleLogout}
                   className="inline-flex items-center justify-center px-3 sm:px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                 >
@@ -70,6 +131,49 @@ const AdminDashboard: React.FC = () => {
                   Logout
                 </button>
               </div>
+            </div>
+          </div>
+
+          {/* Subscription Plans Management */}
+          <div className="px-3 sm:px-6 py-4 border-b border-gray-200">
+            <div className="flex items-center justify-between mb-3">
+              <h2 className="text-lg sm:text-xl font-semibold text-gray-900 flex items-center gap-2">
+                <Settings className="w-5 h-5" /> Subscription Plans
+              </h2>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {plans.map((plan) => (
+                <div key={plan.id} className="border rounded-lg p-4 bg-white">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-2">
+                        <h3 className="text-base font-semibold text-gray-900 truncate">{plan.name}</h3>
+                        {plan.popular && (
+                          <span className="px-2 py-0.5 text-xs rounded-full bg-purple-100 text-purple-700">Popular</span>
+                        )}
+                      </div>
+                      <div className="text-sm text-gray-700 mt-1">PKR {plan.price.toLocaleString()} / {plan.frequency}</div>
+                      <div className="text-xs text-gray-500">{plan.bottles} bottles • {plan.savings || '—'}</div>
+                      {plan.features && plan.features.length > 0 && (
+                        <ul className="mt-2 text-xs text-gray-600 list-disc list-inside space-y-0.5">
+                          {plan.features.map((f, i) => (
+                            <li key={i}>{f}</li>
+                          ))}
+                        </ul>
+                      )}
+                    </div>
+                    <div className="flex flex-col gap-2 ml-2 shrink-0">
+                      <button onClick={() => openEditPlan(plan.id)} className="text-blue-600 hover:text-blue-800">Edit</button>
+                      <button onClick={() => {
+                        if (confirm('Delete this plan?')) deletePlan(plan.id);
+                      }} className="text-red-600 hover:text-red-800">Delete</button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+              {plans.length === 0 && (
+                <div className="text-sm text-gray-500">No plans yet. Click "Add Subscription Plan" to create one.</div>
+              )}
             </div>
           </div>
 
@@ -204,7 +308,7 @@ const AdminDashboard: React.FC = () => {
         </div>
       </div>
 
-      {/* Add/Edit Modal */}
+      {/* Add/Edit Product Modal */}
       {(showAddModal || editingProduct) && (
         <ProductModal
           product={editingProduct}
@@ -212,6 +316,18 @@ const AdminDashboard: React.FC = () => {
             setShowAddModal(false);
             setEditingProduct(null);
           }}
+        />
+      )}
+
+      {/* Add/Edit Subscription Plan Modal */}
+      {showPlanModal && (
+        <SubscriptionPlanModal
+          plan={editingPlanId ? plans.find(p => p.id === editingPlanId) || undefined : undefined}
+          onClose={() => {
+            setShowPlanModal(false);
+            setEditingPlanId(null);
+          }}
+          onSave={handlePlanSave}
         />
       )}
     </div>

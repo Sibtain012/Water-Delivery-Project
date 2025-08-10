@@ -1,7 +1,7 @@
 import { Product } from '../types';
 import product_1 from '../../assets/images/imgi_21_19-Liter-Bottle-Tap-and-Stand-1_720x.jpg';
 import product_2 from '../../assets/images/imgi_21_500-Ml-12-bottles_720x.jpg';
-import product_3 from '../../assets/images/imgi_21_BlueIllustrativeWorldWaterDayInstagramPost_5_1080x.png';
+import product_3 from '../../assets/images/WhatsApp Image 2025-08-08 at 4.16.47 PM.jpeg';
 import product_4 from '../../assets/images/imgi_21_cooler_720x.jpg';
 import product_5 from '../../assets/images/imgi_6_1.5-Litre-6-bottles_720x.jpg';
 import product_6 from '../../assets/images/imgi_7_6-liter_720x.jpg';

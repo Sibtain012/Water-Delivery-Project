@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { CheckCircle, Package, Clock, ArrowRight } from 'lucide-react';
+import { usePageTitle } from '../hooks/usePageTitle';
 
 interface OrderData {
   id: string;
@@ -13,6 +14,7 @@ interface OrderData {
 }
 
 const OrderConfirmation: React.FC = () => {
+  usePageTitle('Order Confirmation');
   const location = useLocation();
 
   // Get order data from navigation state, with fallback

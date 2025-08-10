@@ -2,10 +2,14 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Plus, Minus, Trash2, ShoppingBag, ArrowRight, MessageSquare, MapPin, Tag, Star } from 'lucide-react';
 import { useCartStore } from '../store/cartStore';
-import { products, subscriptionPlans } from '../data/products';
+import { products } from '../data/products';
+import { useSubscriptionPlanStore } from '../store/subscriptionPlanStore';
+import { usePageTitle } from '../hooks/usePageTitle';
 
 const Cart: React.FC = () => {
+  usePageTitle('Shopping Cart');
   const { items, updateQuantity, removeItem, getTotalPrice, clearCart } = useCartStore();
+  const { plans } = useSubscriptionPlanStore();
   const [orderNote, setOrderNote] = useState('');
   const [shippingZip, setShippingZip] = useState('');
   const [shippingCost, setShippingCost] = useState<number | null>(null);
@@ -175,12 +179,12 @@ const Cart: React.FC = () => {
                             <div className="text-sm text-green-800">
                               <div className="font-medium mb-1 text-xs sm:text-sm">📅 Subscription Details:</div>
                               {(() => {
-                                const plan = subscriptionPlans.find(p => p.id === item.subscriptionPlan);
+                                const plan = plans.find(p => p.id === item.subscriptionPlan);
                                 if (plan) {
                                   return (
                                     <div className="space-y-1">
                                       <div className="text-xs sm:text-sm">• Plan: {plan.name}</div>
-                                      <div className="text-xs sm:text-sm">• Savings: {Math.round(plan.discount * 100)}% off regular price</div>
+                                      <div className="text-xs sm:text-sm">• Savings: {plan.savings || 'Applied'}</div>
                                       <div className="text-xs sm:text-sm">• Delivery: Automatic recurring deliveries</div>
                                       <div className="text-xs mt-2 text-green-700">
                                         ✓ You'll receive {plan.name.toLowerCase()} with free delivery
@@ -452,13 +456,13 @@ const Cart: React.FC = () => {
                     </div>
                     <div className="space-y-1">
                       {items.filter(item => item.purchaseType === 'subscription').map((item, index) => {
-                        const plan = subscriptionPlans.find(p => p.id === item.subscriptionPlan);
+                        const plan = plans.find(p => p.id === item.subscriptionPlan);
                         return (
                           <div key={index} className="text-xs pl-2 border-l-2 border-green-300">
                             <div className="break-words">
                               • {item.product.name} - {plan?.name || item.subscriptionPlan}
-                              {plan && (
-                                <span className="text-green-600"> ({Math.round(plan.discount * 100)}% savings)</span>
+                              {plan && plan.savings && (
+                                <span className="text-green-600"> ({plan.savings})</span>
                               )}
                             </div>
                           </div>

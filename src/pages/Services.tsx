@@ -1,7 +1,10 @@
 import React from 'react';
 import { Truck, RefreshCw, Clock, Shield, Home, Building2 } from 'lucide-react';
+import { usePageTitle } from '../hooks/usePageTitle';
 
 const Services: React.FC = () => {
+  usePageTitle('Services');
+
   const services = [
     {
       icon: Truck,

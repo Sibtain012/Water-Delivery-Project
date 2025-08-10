@@ -2,10 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { Filter } from 'lucide-react';
 import ProductCard from '../components/ProductCard';
 import AddToCartModal from '../components/AddToCartModal';
-import { products } from '../data/products';
+import { useProductStore } from '../store/productStore';
 import { Product } from '../types';
+import { usePageTitle } from '../hooks/usePageTitle';
 
 const Products: React.FC = () => {
+  usePageTitle('Products');
+  const { products } = useProductStore();
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [filterType, setFilterType] = useState<string>('all');

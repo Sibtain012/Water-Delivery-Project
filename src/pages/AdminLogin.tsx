@@ -2,8 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { useAuthStore } from '../store/authStore';
 import { useNavigate } from 'react-router-dom';
 import { Lock, User } from 'lucide-react';
+import { usePageTitle } from '../hooks/usePageTitle';
 
 const AdminLogin: React.FC = () => {
+  usePageTitle('Admin Login');
+
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');

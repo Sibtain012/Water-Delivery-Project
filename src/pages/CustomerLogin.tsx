@@ -3,8 +3,10 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { authService } from '../services/authService';
 import { LogIn, ShoppingBag, Eye, EyeOff, UserPlus } from 'lucide-react';
 import { FcGoogle } from 'react-icons/fc';
+import { usePageTitle } from '../hooks/usePageTitle';
 
 const CustomerLogin: React.FC = () => {
+  usePageTitle('Customer Login');
   const navigate = useNavigate();
   const location = useLocation();
   const [mode, setMode] = useState<'signin' | 'signup' | 'email-signin' | 'email-signup'>('signin');
@@ -19,10 +21,10 @@ const CustomerLogin: React.FC = () => {
   const handleGoogleSignIn = async () => {
     setError('');
     setIsLoading(true);
-    
+
     try {
       const response = await authService.signInWithGoogle();
-      
+
       if (response.success) {
         navigate(from, { replace: true });
       } else {
@@ -42,17 +44,17 @@ const CustomerLogin: React.FC = () => {
 
     try {
       let response;
-      
+
       if (mode === 'email-signup') {
         response = await authService.signUpWithEmail(
-          formData.email, 
-          formData.password, 
+          formData.email,
+          formData.password,
           formData.name || formData.email.split('@')[0]
         );
       } else if (mode === 'email-signin') {
         response = await authService.signInWithEmail(formData.email, formData.password);
       }
-      
+
       if (response?.success) {
         navigate(from, { replace: true });
       } else {
@@ -87,12 +89,12 @@ const CustomerLogin: React.FC = () => {
             {isSignupMode ? 'Create Account' : 'Sign In'}
           </h2>
           <p className="mt-2 text-sm text-gray-600">
-            {isSignupMode 
+            {isSignupMode
               ? 'Choose your preferred signup method'
               : 'Sign in to your existing account'
             }
           </p>
-          
+
           {/* Mode Toggle Buttons */}
           <div className="flex justify-center space-x-4 mt-4">
             <button
@@ -117,7 +119,7 @@ const CustomerLogin: React.FC = () => {
                 {error}
               </div>
             )}
-            
+
             {!isEmailMode ? (
               /* Google and Email Options */
               <div className="space-y-4">
@@ -147,7 +149,7 @@ const CustomerLogin: React.FC = () => {
                     </span>
                   </div>
                 </div>
-                
+
                 <button
                   onClick={() => setMode(isSignupMode ? 'email-signup' : 'email-signin')}
                   className="w-full flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
@@ -179,7 +181,7 @@ const CustomerLogin: React.FC = () => {
                     />
                   </div>
                 )}
-                
+
                 <div>
                   <label htmlFor="email" className="block text-sm font-medium text-gray-700">
                     Email address
@@ -196,7 +198,7 @@ const CustomerLogin: React.FC = () => {
                     placeholder="Enter your email"
                   />
                 </div>
-                
+
                 <div>
                   <label htmlFor="password" className="block text-sm font-medium text-gray-700">
                     Password
@@ -226,7 +228,7 @@ const CustomerLogin: React.FC = () => {
                     </button>
                   </div>
                 </div>
-                
+
                 <button
                   type="submit"
                   disabled={isLoading || !formData.email || !formData.password}
@@ -238,7 +240,7 @@ const CustomerLogin: React.FC = () => {
                     mode === 'email-signup' ? 'Sign Up' : 'Sign In'
                   )}
                 </button>
-                
+
                 <button
                   type="button"
                   onClick={() => {

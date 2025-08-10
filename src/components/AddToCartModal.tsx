@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { X, Check } from 'lucide-react';
 import { Product, CartItem } from '../types';
-import { subscriptionPlans } from '../data/products';
+import { useSubscriptionPlanStore } from '../store/subscriptionPlanStore';
 import { useCartStore } from '../store/cartStore';
 
 interface AddToCartModalProps {
@@ -16,6 +16,7 @@ const AddToCartModal: React.FC<AddToCartModalProps> = ({ product, isOpen, onClos
   const [subscriptionPlan, setSubscriptionPlan] = useState('');
   const [hasBottleExchange, setHasBottleExchange] = useState(false);
   const { addItem, toggleCart } = useCartStore();
+  const { plans } = useSubscriptionPlanStore();
 
   if (!isOpen || !product) return null;
 
@@ -142,7 +143,7 @@ const AddToCartModal: React.FC<AddToCartModalProps> = ({ product, isOpen, onClos
                   setSubscriptionPlan(e.target.value);
                   // Auto-add to cart when subscription plan is selected
                   if (e.target.value) {
-                    const selectedPlan = subscriptionPlans.find(plan => plan.id === e.target.value);
+                    const selectedPlan = plans.find(plan => plan.id === e.target.value);
                     if (selectedPlan) {
                       const cartItem: CartItem = {
                         product,
@@ -164,9 +165,9 @@ const AddToCartModal: React.FC<AddToCartModalProps> = ({ product, isOpen, onClos
                 className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               >
                 <option value="">Select a plan to add to cart</option>
-                {subscriptionPlans.map((plan) => (
+                {plans.map((plan) => (
                   <option key={plan.id} value={plan.id}>
-                    {plan.name} ({Math.round(plan.discount * 100)}% off)
+                    {plan.name} {plan.savings ? `(${plan.savings})` : ''}
                   </option>
                 ))}
               </select>

@@ -1,6 +1,10 @@
 import React from 'react';
 import FeatureSection from '../components/FeatureSection';
+import { usePageTitle } from '../hooks/usePageTitle';
+
 const About: React.FC = () => {
+  usePageTitle('About Us');
+
   const stats = [
     { label: 'Years of Experience', value: '15+' },
     { label: 'Happy Customers', value: '50K+' },

@@ -1,7 +1,10 @@
 import React, { useState } from 'react';
 import { Phone, Mail, MapPin, Clock, Send } from 'lucide-react';
+import { usePageTitle } from '../hooks/usePageTitle';
 
 const Contact: React.FC = () => {
+  usePageTitle('Contact Us');
+
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -48,7 +51,7 @@ const Contact: React.FC = () => {
     {
       icon: MapPin,
       title: 'Office',
-      details: 'Rawalpindi & Islamabad',
+      details: ' Jagiot Road Near Bheria Enclave, ISLAMABAD',
       subtext: 'Click to view location',
       link: 'https://www.google.com/maps?ll=33.687527,73.224985&z=16&t=m&hl=en&gl=US&mapclient=embed&cid=16322839347137715683'
     },
