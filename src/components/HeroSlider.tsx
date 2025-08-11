@@ -22,7 +22,7 @@ const HeroSlider: React.FC<HeroSliderProps> = ({ onOrderToday, onSubscribeClick 
     {
       id: 1,
       tagline: "~ Understand the importance of life",
-      title: "Pure & Healthy",
+      title: "ImPure & UHealthy Water",
       subtitle: "Drinking Water",
       buttonText1: "ORDER TODAY!",
       buttonText2: "SUBSCRIBE NOW",
@@ -70,8 +70,8 @@ const HeroSlider: React.FC<HeroSliderProps> = ({ onOrderToday, onSubscribeClick 
               {/* Background Image */}
               <div
                 className={`absolute top-0 w-full h-full bg-no-repeat z-0 ${slide.isFullBackground
-                    ? 'left-0 bg-cover bg-center'
-                    : 'right-0 bg-contain bg-right-center md:bg-right-center hidden md:block'
+                  ? 'left-0 bg-cover bg-center'
+                  : 'right-0 bg-contain bg-right-center md:bg-right-center hidden md:block'
                   }`}
                 style={{
                   backgroundImage: `url(${slide.backgroundImage})`,
