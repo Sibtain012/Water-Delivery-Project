@@ -13,7 +13,7 @@ import {
   startAfter,
   DocumentSnapshot
 } from 'firebase/firestore';
-import { db } from '../lib/firebase';
+import auth, { db } from '../lib/firebase';
 import { FirebaseOrder, COLLECTIONS, PERMISSIONS } from '../types/firebase';
 import { securityService } from './securityService';
 
@@ -28,13 +28,13 @@ class FirebaseOrderService {
     // Apply rate limiting only for authenticated users
     if (!isGuestOrder && securityService.isRateLimited('create_order', 5, 60000)) {
       throw new Error('Rate limit exceeded. Please try again later.');
-    }    try {
+    } try {
       // Sanitize input data
       const allowedFields: (keyof typeof orderData)[] = [
         'customerId', 'customerFirebaseUid', 'items', 'customerDetails', 'total',
         'status', 'paymentStatus', 'paymentMethod', 'deliveryDate', 'deliveryTime'
       ];
-      
+
       let sanitizedData;
       try {
         sanitizedData = securityService.sanitizeInput(orderData, allowedFields);

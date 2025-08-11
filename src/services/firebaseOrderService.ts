@@ -7,7 +7,6 @@ import {
   deleteDoc,
   orderBy,
   query,
-  where
 } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import { FirebaseOrder, COLLECTIONS } from '../types/firebase';

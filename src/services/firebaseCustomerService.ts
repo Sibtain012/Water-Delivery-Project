@@ -11,10 +11,9 @@ import {
   limit,
   serverTimestamp
 } from 'firebase/firestore';
-import { auth, db } from '../lib/firebase';
+import auth, { db } from '../lib/firebase';
 import { FirebaseCustomer, COLLECTIONS, PERMISSIONS } from '../types/firebase';
 import { securityService } from './securityService';
-import { firebaseOperations } from './firebaseOperations';
 
 class FirebaseCustomerService {
   /**

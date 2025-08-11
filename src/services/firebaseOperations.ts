@@ -1,11 +1,9 @@
 import { db } from '../lib/firebase';
-import { 
-  collection, 
-  doc, 
-  addDoc, 
-  updateDoc, 
-  deleteDoc, 
-  getDoc, 
+import {
+  collection,
+  doc,
+  addDoc,
+  getDoc,
   getDocs,
   enableNetwork,
   disableNetwork
@@ -61,7 +59,7 @@ class FirebaseOperationsService {
       return await this.safeNetworkOperation(async () => {
         const docRef = doc(db, collectionName, docId);
         const docSnap = await getDoc(docRef);
-        
+
         if (docSnap.exists()) {
           return { id: docSnap.id, ...docSnap.data() };
         }
@@ -81,10 +79,11 @@ class FirebaseOperationsService {
         return [];
       }
 
-      return await this.safeNetworkOperation(async () => {
+      const result = await this.safeNetworkOperation(async () => {
         const querySnapshot = await getDocs(collection(db, collectionName));
         return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
       });
+      return result ?? [];
     } catch (error) {
       console.error('❌ Failed to read collection:', error);
       return [];
@@ -94,20 +93,20 @@ class FirebaseOperationsService {
   // Safe network operation wrapper
   private async safeNetworkOperation<T>(operation: () => Promise<T>): Promise<T | null> {
     let networkWasEnabled = false;
-    
+
     try {
       // Try to enable network for this operation
       await enableNetwork(db);
       networkWasEnabled = true;
-      
+
       // Execute the operation with a timeout
       const result = await Promise.race([
         operation(),
-        new Promise<T>((_, reject) => 
+        new Promise<T>((_, reject) =>
           setTimeout(() => reject(new Error('Operation timeout')), 10000)
         )
       ]);
-      
+
       return result;
     } catch (error) {
       console.warn('⚠️ Network operation failed:', error);

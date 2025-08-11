@@ -5,7 +5,6 @@ import {
   getDoc,
   addDoc,
   updateDoc,
-  deleteDoc,
   query,
   where,
   orderBy,
@@ -56,7 +55,7 @@ class FirebaseProductService {
         hasMore: snapshot.docs.length === limitCount
       };
     } catch (error) {
-      await securityService.logActivity('READ', 'products', 'multiple', false, 
+      await securityService.logActivity('READ', 'products', 'multiple', false,
         error instanceof Error ? error.message : 'Unknown error'
       );
       throw error;
@@ -87,7 +86,7 @@ class FirebaseProductService {
       await securityService.logActivity('READ', 'products', 'featured', true);
       return products;
     } catch (error) {
-      await securityService.logActivity('READ', 'products', 'featured', false, 
+      await securityService.logActivity('READ', 'products', 'featured', false,
         error instanceof Error ? error.message : 'Unknown error'
       );
       throw error;
@@ -107,7 +106,7 @@ class FirebaseProductService {
       }
 
       const data = docSnap.data() as FirebaseProduct;
-      
+
       if (!data.isActive) {
         return null; // Don't return inactive products to public
       }
@@ -115,7 +114,7 @@ class FirebaseProductService {
       await securityService.logActivity('READ', 'product', id, true);
       return this.convertToProduct(data);
     } catch (error) {
-      await securityService.logActivity('READ', 'product', id, false, 
+      await securityService.logActivity('READ', 'product', id, false,
         error instanceof Error ? error.message : 'Unknown error'
       );
       throw error;
@@ -143,7 +142,7 @@ class FirebaseProductService {
       await securityService.logActivity('READ', 'products', 'admin_all', true);
       return products;
     } catch (error) {
-      await securityService.logActivity('READ', 'products', 'admin_all', false, 
+      await securityService.logActivity('READ', 'products', 'admin_all', false,
         error instanceof Error ? error.message : 'Unknown error'
       );
       throw error;
@@ -163,10 +162,10 @@ class FirebaseProductService {
     try {
       // Sanitize input data
       const allowedFields: (keyof typeof productData)[] = [
-        'name', 'description', 'price', 'imageUrl', 'size', 'type', 
+        'name', 'description', 'price', 'imageUrl', 'size', 'type',
         'featured', 'hasExchange', 'depositPrice', 'isActive'
       ];
-      
+
       const sanitizedData = securityService.sanitizeInput(productData, allowedFields);
 
       // Validate required fields
@@ -202,7 +201,7 @@ class FirebaseProductService {
 
       return docRef.id;
     } catch (error) {
-      await securityService.logActivity('CREATE', 'product', 'new', false, 
+      await securityService.logActivity('CREATE', 'product', 'new', false,
         error instanceof Error ? error.message : 'Unknown error'
       );
       throw error;
@@ -222,10 +221,10 @@ class FirebaseProductService {
     try {
       // Sanitize input data
       const allowedFields: (keyof FirebaseProduct)[] = [
-        'name', 'description', 'price', 'imageUrl', 'size', 'type', 
+        'name', 'description', 'price', 'imageUrl', 'size', 'type',
         'featured', 'hasExchange', 'depositPrice', 'isActive'
       ];
-      
+
       const sanitizedUpdates = securityService.sanitizeInput(updates, allowedFields);
 
       // Validate price if provided
@@ -247,7 +246,7 @@ class FirebaseProductService {
         updatedFields: Object.keys(sanitizedUpdates)
       });
     } catch (error) {
-      await securityService.logActivity('UPDATE', 'product', id, false, 
+      await securityService.logActivity('UPDATE', 'product', id, false,
         error instanceof Error ? error.message : 'Unknown error'
       );
       throw error;
@@ -266,7 +265,7 @@ class FirebaseProductService {
 
     try {
       const docRef = doc(db, COLLECTIONS.PRODUCTS, id);
-      
+
       // Soft delete - just mark as inactive
       await updateDoc(docRef, {
         isActive: false,
@@ -275,7 +274,7 @@ class FirebaseProductService {
 
       await securityService.logActivity('DELETE', 'product', id, true);
     } catch (error) {
-      await securityService.logActivity('DELETE', 'product', id, false, 
+      await securityService.logActivity('DELETE', 'product', id, false,
         error instanceof Error ? error.message : 'Unknown error'
       );
       throw error;
@@ -304,7 +303,7 @@ class FirebaseProductService {
           .filter(doc => {
             const data = doc.data() as FirebaseProduct;
             return data.name.toLowerCase().includes(searchTermLower) ||
-                   data.description.toLowerCase().includes(searchTermLower);
+              data.description.toLowerCase().includes(searchTermLower);
           })
           .map(async (docSnapshot) => {
             const data = docSnapshot.data() as FirebaseProduct;
@@ -315,7 +314,7 @@ class FirebaseProductService {
       await securityService.logActivity('SEARCH', 'products', searchTerm, true);
       return products;
     } catch (error) {
-      await securityService.logActivity('SEARCH', 'products', searchTerm, false, 
+      await securityService.logActivity('SEARCH', 'products', searchTerm, false,
         error instanceof Error ? error.message : 'Unknown error'
       );
       throw error;
@@ -345,7 +344,7 @@ class FirebaseProductService {
       await securityService.logActivity('READ', 'products', `type_${type}`, true);
       return products;
     } catch (error) {
-      await securityService.logActivity('READ', 'products', `type_${type}`, false, 
+      await securityService.logActivity('READ', 'products', `type_${type}`, false,
         error instanceof Error ? error.message : 'Unknown error'
       );
       throw error;
@@ -388,7 +387,7 @@ class FirebaseProductService {
         batchSize: updates.length
       });
     } catch (error) {
-      await securityService.logActivity('BATCH_UPDATE', 'products', 'multiple', false, 
+      await securityService.logActivity('BATCH_UPDATE', 'products', 'multiple', false,
         error instanceof Error ? error.message : 'Unknown error'
       );
       throw error;
