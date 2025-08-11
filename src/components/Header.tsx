@@ -1,7 +1,10 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { ShoppingCart, Menu, X, User } from 'lucide-react';
+import { ShoppingCart, Search, Menu, X, User } from 'lucide-react';
 import { useCartStore } from '../store/cartStore';
+
+// Import logo as a module for better React support
+import logo from '../../assets/images/logo.png';
 
 const Header = () => {
   const location = useLocation();
@@ -27,7 +30,7 @@ const Header = () => {
           {/* Left: Logo */}
           <Link to="/" className="flex items-center space-x-2">
             <img
-              src="/assets/images/logo.png"
+              src={logo}
               alt="Logo"
               className="h-24 sm:h-28 md:h-32 lg:h-36 object-contain"
             />
@@ -55,6 +58,10 @@ const Header = () => {
                 </Link>
               ))}
             </nav>
+
+            <button className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-secondary shadow-md flex items-center justify-center hover:bg-accent transition-colors">
+              <Search className="w-4 h-4 sm:w-5 sm:h-5 text-text" />
+            </button>
 
             {/* Login Button */}
             <a

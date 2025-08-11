@@ -7,6 +7,11 @@ import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 
+// Import images (adjust relative path as needed)
+import doubleBottle from '../../assets/images/double-bottle.png';
+import hero1 from '../../assets/images/icons/Ice-1.png';
+import hero2 from '../../assets/images/hero-2.png';
+
 interface HeroSliderProps {
   onOrderToday: () => void;
   onSubscribeClick: () => void;
@@ -21,21 +26,21 @@ const HeroSlider: React.FC<HeroSliderProps> = ({ onOrderToday, onSubscribeClick 
       subtitle: "Drinking Water",
       buttonText1: "ORDER TODAY!",
       buttonText2: "SUBSCRIBE NOW",
-      image: "/assets/images/double-bottle.png",
+      image: doubleBottle,
       imageAlt: "Water Bottles",
-      backgroundImage: "/assets/images/icons/ice-1.png",
+      backgroundImage: hero1,
       isFullBackground: false
     },
     {
       id: 2,
       tagline: "~ Fresh and Available",
       title: "ABE TAHURA",
-      para: "The Perfect TDS for Kidney, Refereshing Hydration in Every Drop",
+      para: "The Perfect TDdS for Kidney, Refereshing Hydration in Every Drop",
       buttonText1: "ORDER NOW!",
       buttonText2: "SUBSCRIBE TODAY",
-      image: "/assets/images/double-bottle.png",
+      image: doubleBottle,
       imageAlt: "Water Delivery",
-      backgroundImage: "/assets/images/hero-2.png",
+      backgroundImage: hero2,
       isFullBackground: true
     }
   ];
@@ -65,11 +70,11 @@ const HeroSlider: React.FC<HeroSliderProps> = ({ onOrderToday, onSubscribeClick 
               {/* Background Image */}
               <div
                 className={`absolute top-0 w-full h-full bg-no-repeat z-0 ${slide.isFullBackground
-                  ? 'left-0 bg-cover bg-center'
-                  : 'right-0 bg-contain bg-right-center md:bg-right-center hidden md:block'
+                    ? 'left-0 bg-cover bg-center'
+                    : 'right-0 bg-contain bg-right-center md:bg-right-center hidden md:block'
                   }`}
                 style={{
-                  backgroundImage: `url('${slide.backgroundImage}')`,
+                  backgroundImage: `url(${slide.backgroundImage})`,
                   ...(slide.isFullBackground
                     ? {
                       backgroundSize: 'cover',
