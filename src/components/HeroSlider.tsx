@@ -22,7 +22,7 @@ const HeroSlider: React.FC<HeroSliderProps> = ({ onOrderToday, onSubscribeClick 
     {
       id: 1,
       tagline: "~ Understand the importance of life",
-      title: "ImPure & UHealthy Water",
+      title: "Pure & Healthy Water",
       subtitle: "Drinking Water",
       buttonText1: "ORDER TODAY!",
       buttonText2: "SUBSCRIBE NOW",
