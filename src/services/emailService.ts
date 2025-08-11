@@ -58,7 +58,7 @@ class EmailService {
             // Template parameters matching your ADMIN template exactly
             const templateParams = {
                 // CRITICAL: EmailJS needs to_email parameter for routing
-                to_email: 'sibtainahmed2001@gmail.com',
+                to_email: 'aabetahura@gmail.com',
                 to_name: 'Admin',
 
                 // Your template variables
@@ -173,7 +173,7 @@ class EmailService {
         const testOrderData: OrderEmailData = {
             orderId: 'TEST-' + Date.now(),
             customerName: 'Test Customer',
-            customerEmail: 'sibtainahmed2001@gmail.com',
+            customerEmail: 'aabetahura@gmail.com',
             customerPhone: '+1234567890',
             customerAddress: '123 Test Street, Test City, 12345',
             orderItems: [
