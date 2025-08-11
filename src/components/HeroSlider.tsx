@@ -9,7 +9,7 @@ import 'swiper/css/pagination';
 
 // Import images (adjust relative path as needed)
 import doubleBottle from '../../assets/images/double-bottle.png';
-import hero1 from '../../assets/images/icons/Ice-1.png';
+import hero1 from '../../assets/images/icons/ice-1.png';
 import hero2 from '../../assets/images/hero-2.png';
 
 interface HeroSliderProps {
