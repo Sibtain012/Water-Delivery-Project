@@ -39,7 +39,7 @@ const Header = () => {
           {/* Center: Delivery Text */}
           <div className="hidden lg:flex items-center bg-accent rounded-lg px-3 lg:px-4 py-2 shadow-sm">
             <span className="text-text text-xs lg:text-sm">Get Free Delivery</span>
-            <a href="tel:+92334-697774" className="ml-2 text-base lg:text-lg font-semibold text-secondary hover:text-primary transition-colors">+92 334 697774</a>
+            <a href="tel:+92334-6977744" className="ml-2 text-base lg:text-lg font-semibold text-secondary hover:text-primary transition-colors">+92 334 6977744</a>
           </div>
 
           {/* Right: Nav + Icons */}
@@ -129,8 +129,8 @@ const Header = () => {
             <div className="mt-6 pt-4 border-t border-text/10">
               <div className="flex items-center justify-center bg-accent/20 rounded-lg px-4 py-3">
                 <span className="text-text text-sm">Get Free Delivery</span>
-                <a href="tel:+8120703692" className="ml-2 text-base font-semibold text-secondary">
-                  812-070-3692
+                <a href="tel:+92334-6977744" className="ml-2 text-base font-semibold text-secondary">
+                  +92334-6977744
                 </a>
               </div>
             </div>

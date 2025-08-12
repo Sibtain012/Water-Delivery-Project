@@ -16,13 +16,13 @@ const Footer: React.FC = () => {
   return (
     <footer className="bg-[#0c2c59] text-slate-100 relative overflow-hidden">
       {/* Email Subscribe */}
-      <div className="max-w-7xl mx-auto px-4 py-10 flex justify-start"> <div className="relative w-full md:w-[40%]">
+      {/* <div className="max-w-7xl mx-auto px-4 py-10 flex justify-start"> <div className="relative w-full md:w-[40%]">
         <input type="email" placeholder="Email Address" className="w-full px-6 py-3 pr-36 text-base rounded-full text-slate-700 placeholder-slate-500 outline-none" />
         <button className="absolute right-1 top-1 bottom-1 bg-secondary hover:bg- text-slate-900 font-bold px-6 rounded-full transition" >
           SUBSCRIBE
         </button>
       </div>
-      </div>
+      </div> */}
 
       {/* Wave Divider */}
       <div
@@ -50,11 +50,76 @@ const Footer: React.FC = () => {
             About Us
           </h4>
           <ul className="space-y-2 text-sm text-slate-300">
-            <li><Link to="/about" className="hover:text-secondary transition">Why Choose Us</Link></li>
-            <li><Link to="/products" className="hover:text-secondary transition">Free Water Bottles</Link></li>
-            <li><Link to="/contact" className="hover:text-secondary transition">Contact Us</Link></li>
-            <li><Link to="/terms" className="hover:text-secondary transition">Terms & Conditions</Link></li>
-            <li><Link to="/privacy" className="hover:text-secondary transition">Privacy & Policy</Link></li>
+            <li>
+              <Link
+                to="/about"
+                className="hover:text-secondary transition"
+                onClick={() => {
+                  setTimeout(() => {
+                    const heading = document.querySelector('h1, h2, h3, h4, h5, h6');
+                    heading?.scrollIntoView({ behavior: 'smooth' });
+                  }, 100);
+                }}
+              >
+                Why Choose Us
+              </Link>
+            </li>
+            <li>
+              <Link
+                to="/products"
+                className="hover:text-secondary transition"
+                onClick={() => {
+                  setTimeout(() => {
+                    const heading = document.querySelector('h1, h2, h3, h4, h5, h6');
+                    heading?.scrollIntoView({ behavior: 'smooth' });
+                  }, 100);
+                }}
+              >
+                Water Bottles
+              </Link>
+            </li>
+            <li>
+              <Link
+                to="/contact"
+                className="hover:text-secondary transition"
+                onClick={() => {
+                  setTimeout(() => {
+                    const heading = document.querySelector('h1, h2, h3, h4, h5, h6');
+                    heading?.scrollIntoView({ behavior: 'smooth' });
+                  }, 100);
+                }}
+              >
+                Contact Us
+              </Link>
+            </li>
+            <li>
+              <Link
+                to="/terms"
+                className="hover:text-secondary transition"
+                onClick={() => {
+                  setTimeout(() => {
+                    const heading = document.querySelector('h1, h2, h3, h4, h5, h6');
+                    heading?.scrollIntoView({ behavior: 'smooth' });
+                  }, 100);
+                }}
+              >
+                Terms & Conditions
+              </Link>
+            </li>
+            <li>
+              <Link
+                to="/privacy"
+                className="hover:text-secondary transition"
+                onClick={() => {
+                  setTimeout(() => {
+                    const heading = document.querySelector('h1, h2, h3, h4, h5, h6');
+                    heading?.scrollIntoView({ behavior: 'smooth' });
+                  }, 100);
+                }}
+              >
+                Privacy & Policy
+              </Link>
+            </li>
           </ul>
         </div>
 

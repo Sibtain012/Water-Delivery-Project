@@ -16,8 +16,8 @@ export const products: Product[] = [
     size: '19 Liters',
     type: 'bottle',
     featured: true,
-    hasExchange: false,
-    depositPrice: 0
+    hasExchange: true,
+    depositPrice: 1000
   },
   {
     id: '2',
@@ -28,8 +28,8 @@ export const products: Product[] = [
     size: '1.5 Liters',
     type: 'bottle',
     featured: true,
-    hasExchange: false,
-    depositPrice: 0
+    hasExchange: true,
+    depositPrice: 1000
   },
   {
     id: '3',
@@ -40,8 +40,8 @@ export const products: Product[] = [
     size: '500 ML',
     type: 'bottle',
     featured: true,
-    hasExchange: false,
-    depositPrice: 0
+    hasExchange: true,
+    depositPrice: 1000
   },
   {
     id: '4',
@@ -52,8 +52,8 @@ export const products: Product[] = [
     size: '19 Liters',
     type: 'dispenser',
     featured: false,
-    hasExchange: false,
-    depositPrice: 0
+    hasExchange: true,
+    depositPrice: 1000
   },
   {
     id: '5',
@@ -64,8 +64,8 @@ export const products: Product[] = [
     size: '6 Liters',
     type: 'bottle',
     featured: false,
-    hasExchange: false,
-    depositPrice: 0
+    hasExchange: true,
+    depositPrice: 1000
   },
   {
     id: '6',
@@ -74,7 +74,7 @@ export const products: Product[] = [
     price: 600.00,
     image: product_1,
     size: '19 Liters',
-    type: 'bottle',
+    type: 'accessory',
     featured: false,
     hasExchange: true,
     depositPrice: 500.00
